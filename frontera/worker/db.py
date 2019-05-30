@@ -17,7 +17,7 @@ from frontera.logger.handlers import CONSOLE
 
 from frontera.settings import Settings
 from frontera.utils.misc import load_object
-from frontera.utils.async import CallLaterOnce
+from frontera.utils.twisted_helpers import CallLaterOnce
 from .server import WorkerJsonRpcService
 import six
 from six.moves import map
