@@ -94,7 +94,7 @@ class DBWorker(object):
         self.scoring_log_consumer_batch_size = settings.get('SCORING_LOG_CONSUMER_BATCH_SIZE')
 
         if settings.get('QUEUE_HOSTNAME_PARTITIONING'):
-            self.logger.warning('QUEUE_HOSTNAME_PARTITIONING is deprecated, use SPIDER_FEED_PARTITIONER instead.')
+            logger.warning('QUEUE_HOSTNAME_PARTITIONING is deprecated, use SPIDER_FEED_PARTITIONER instead.')
             settings.set('SPIDER_FEED_PARTITIONER', 'frontera.contrib.backends.partitioners.Crc32NamePartitioner')
         self.partitioner_cls = load_object(settings.get('SPIDER_FEED_PARTITIONER'))
         self.max_next_requests = settings.MAX_NEXT_REQUESTS
@@ -166,25 +166,25 @@ class DBWorker(object):
                         request = response.request
                         request_fingerprint = request.meta.get(b'fingerprint').decode() if request else None
 
-                        logger.debug("Page crawled %s [%s from %s]", response.url, response.meta.get(b'fingerprint').decode(), request_fingerprint)
+                        logger.debug("Page crawled %s [%s from %s]", response.url, response.meta.get(b'fingerprint').decode(), request_fingerprint, extra={"obj": response})
                         if b'jid' not in response.meta or response.meta[b'jid'] != self.job_id:
-                            logger.warning('Response {} has no jid'.format(response))
+                            logger.warning('Response {} has no jid'.format(response), extra={"obj": response})
                             continue
                         self._backend.page_crawled(response)
                         continue
                     if type == 'links_extracted':
                         _, request, links = msg
-                        logger.debug("Links extracted %s (%d) [%s]", request.url, len(links), request.meta.get(b'fingerprint').decode())
+                        logger.debug("Links extracted %s (%d) [%s]", request.url, len(links), request.meta.get(b'fingerprint').decode(), extra={"obj": request})
                         if b'jid' not in request.meta or request.meta[b'jid'] != self.job_id:
-                            logger.warning('Response {} has no jid'.format(request))
+                            logger.warning('Response {} has no jid'.format(request), extra={"obj": request})
                             continue
                         self._backend.links_extracted(request, links)
                         continue
                     if type == 'request_error':
                         _, request, error = msg
-                        logger.debug("Request error %s [%s]", request.url, request.meta.get(b'fingerprint'))
+                        logger.debug("Request error %s [%s]", request.url, request.meta.get(b'fingerprint'), extra={"obj": request})
                         if b'jid' not in request.meta or request.meta[b'jid'] != self.job_id:
-                            logger.warning('Response {} has no jid'.format(request))
+                            logger.warning('Response {} has no jid'.format(request), extra={"obj": request})
                             continue
                         self._backend.request_error(request, error)
                         continue
@@ -198,7 +198,7 @@ class DBWorker(object):
                             continue
                         _, partition_id, netlocs = msg
                         for netloc in netlocs:
-                            logger.debug('Domain: %s', netloc)
+                            logger.debug('Domain: %s', netloc, extra={"source": netloc})
                         self._backend.set_overused(partition_id, netlocs)
                         continue
                     logger.debug('Unknown message type %s', type)
@@ -265,7 +265,7 @@ class DBWorker(object):
             except Exception as e:
                 logger.error("Encoding error, %s, fingerprint: %s, url: %s" % (e,
                                                                                request.meta[b'fingerprint'],
-                                                                               request.url))
+                                                                               request.url), extra={"obj": request})
                 continue
             finally:
                 count += 1
