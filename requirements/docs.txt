@@ -3,7 +3,7 @@ sphinx-rtd-theme>=0.1.6
 SQLAlchemy>=1.0.0
 happybase>=1.0.0
 w3lib
-msgpack-python
+msgpack>=1.0.0
 pyzmq
 kafka-python<=0.9.5
 pytest>=2.6.4
