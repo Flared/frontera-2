@@ -64,13 +64,13 @@ class BaseModel(object):
         return session.query(q.exists()).scalar()
 
 
-class CrawlPageRelation(BaseModel, Base):
+class CrawlPageRelation(Base, BaseModel):
     __tablename__ = 'crawl_page_relations'
     parent_id = Column(Integer, ForeignKey('crawl_pages.id'), primary_key=True, index=True)
     child_id = Column(Integer, ForeignKey('crawl_pages.id'), primary_key=True, index=True)
 
 
-class CrawlPage(BaseModel, Base):
+class CrawlPage(Base, BaseModel):
     __tablename__ = 'crawl_pages'
     __table_args__ = (
         UniqueConstraint('url'),
