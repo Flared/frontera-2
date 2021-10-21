@@ -6,26 +6,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import types
 import six
 
-Base = declarative_base()
-
-
-class Choice(types.TypeDecorator):
-    impl = types.CHAR
-
-    def __init__(self, choices, default, **kwargs):
-        self.choices = dict(choices)
-        values = [k for k, v in six.iteritems(self.choices)]
-        if default not in values:
-            raise ValueError("default value '%s' not found in choices %s" % (default, values))
-        self.default = default
-        super(Choice, self).__init__(**kwargs)
-
-    def process_bind_param(self, value, dialect):
-        return value or self.default
-
-    def process_result_value(self, value, dialect):
-        return self.choices[value]
-
 
 class BaseModel(object):
     __abstract__ = True
@@ -64,17 +44,34 @@ class BaseModel(object):
         return session.query(q.exists()).scalar()
 
 
-class Model(Base, BaseModel):
-    pass
+Base = declarative_base(cls=BaseModel)
 
 
-class CrawlPageRelation(Model):
+class Choice(types.TypeDecorator):
+    impl = types.CHAR
+
+    def __init__(self, choices, default, **kwargs):
+        self.choices = dict(choices)
+        values = [k for k, v in six.iteritems(self.choices)]
+        if default not in values:
+            raise ValueError("default value '%s' not found in choices %s" % (default, values))
+        self.default = default
+        super(Choice, self).__init__(**kwargs)
+
+    def process_bind_param(self, value, dialect):
+        return value or self.default
+
+    def process_result_value(self, value, dialect):
+        return self.choices[value]
+
+
+class CrawlPageRelation(Base):
     __tablename__ = 'crawl_page_relations'
     parent_id = Column(Integer, ForeignKey('crawl_pages.id'), primary_key=True, index=True)
     child_id = Column(Integer, ForeignKey('crawl_pages.id'), primary_key=True, index=True)
 
 
-class CrawlPage(Model):
+class CrawlPage(Base):
     __tablename__ = 'crawl_pages'
     __table_args__ = (
         UniqueConstraint('url'),
