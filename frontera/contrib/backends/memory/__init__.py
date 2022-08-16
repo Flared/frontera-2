@@ -1,7 +1,8 @@
 from __future__ import absolute_import
 import logging
 import random
-from collections import deque, Iterable
+from collections import deque
+from collections.abc import Iterable
 
 from frontera.contrib.backends import CommonBackend
 from frontera.core.components import Metadata, Queue, States

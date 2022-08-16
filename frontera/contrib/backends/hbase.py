@@ -21,7 +21,7 @@ from time import time
 from binascii import hexlify, unhexlify
 from io import BytesIO
 from random import choice
-from collections import Iterable
+from collections.abc import Iterable
 import logging
 
 

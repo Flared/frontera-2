@@ -15,7 +15,7 @@ from twisted.internet.task import LoopingCall
 from twisted.internet import reactor
 
 from frontera.settings import Settings
-from collections import Iterable
+from collections.abc import Iterable
 from binascii import hexlify
 import six
 
