@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 from sqlalchemy import Column, String, Integer, Boolean, ForeignKey
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relationship
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import types
@@ -82,7 +82,7 @@ class CrawlPage(Base):
     status = Column(String(50))
     n_redirects = Column(Integer, default=0)
     is_seed = Column(Boolean, default=False)
-    referers = relation(
+    referers = relationship(
         'CrawlPage',
         secondary='crawl_page_relations',
         primaryjoin=CrawlPageRelation.child_id == id,
